@@ -15,10 +15,16 @@ import android.widget.RelativeLayout;
 import com.example.meleagant.moodtrackerfinalversion.Model.MoodData;
 import com.example.meleagant.moodtrackerfinalversion.R;
 
+import java.util.Calendar;
+import java.util.TimeZone;
+
 public class MainActivity extends AppCompatActivity implements GestureDetector.OnGestureListener {
 
     private RelativeLayout mColor;
     private ImageView mSmiley;
+    private String mComment;
+    private int mCurrentMood = 8;
+    private int mDate;
     public static final int BUNDLE_REQUEST_CODE = 77;
     private GestureDetectorCompat mGesture;
     private int smiley[] = {R.drawable.smiley_sad, R.drawable.smiley_disappointed, R.drawable.smiley_normal, R.drawable.smiley_happy, R.drawable.smiley_super_happy};
@@ -154,12 +160,32 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
     protected void onResume() {
         super.onResume();
 
+        //Configure Calendar
+        Calendar mCalendar = Calendar.getInstance(TimeZone.getDefault());
+        mDate = (mCalendar.get(Calendar.YEAR)*10000)+
+                (mCalendar.get(Calendar.MONTH)*100)+
+                (mCalendar.get(Calendar.DAY_OF_MONTH));
+
+        //Load Data
+        try {
+            MoodData.getInstance().loadData();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
 
     @Override
     protected void onStop() {
         super.onStop();
+
+        //Save in Shared Preferences and Gson/Json
+        try {
+            MoodData.getInstance().saveData();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
