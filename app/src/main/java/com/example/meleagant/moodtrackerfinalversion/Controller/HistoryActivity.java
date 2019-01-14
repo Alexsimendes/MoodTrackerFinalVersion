@@ -2,11 +2,15 @@ package com.example.meleagant.moodtrackerfinalversion.Controller;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 
+import com.example.meleagant.moodtrackerfinalversion.Model.MoodData;
+import com.example.meleagant.moodtrackerfinalversion.Model.MoodList;
 import com.example.meleagant.moodtrackerfinalversion.R;
 
 public class HistoryActivity extends AppCompatActivity {
@@ -45,6 +49,40 @@ public class HistoryActivity extends AppCompatActivity {
         mImageViewDaysAgo[5] = findViewById(R.id.activity_history_img_two_days_ago);
         mImageViewDaysAgo[6] = findViewById(R.id.activity_history_img_Yesterday);
 
+        //Update Relative Layouts with mood index
+        for(int i = 0; i < 7; i++){
+            try {
+                MoodList mMood = MoodData.getInstance().getMoodByIndex(7-i);
+                layoutDisplay(mRelativeLayoutDaysAgo[i], mMood.getMood());
+                //Config imageview visibility
+                String mComment = mMood.getComment();
+                if (mComment.equals("")){
+                    mImageViewDaysAgo[i].setVisibility(View.GONE); }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    //Get user phone screen width
+    private int widthPhone() {
+        DisplayMetrics mPhoneScreen = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(mPhoneScreen);
+        return mPhoneScreen.widthPixels;
+    }
+
+    //Update Layout with color and width
+    private void layoutDisplay(RelativeLayout relativeLayout, int mCurrentMood) {
+        ViewGroup.LayoutParams params = relativeLayout.getLayoutParams();
+        int mWidthScreen = widthPhone();
+        //Configure Relative Layouts width and color by mood
+        try {
+            int color[] = MoodData.color;
+            params.width =  (mCurrentMood+1)*mWidthScreen/5;
+            relativeLayout.setBackground(getResources().getDrawable(color[mCurrentMood]));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
