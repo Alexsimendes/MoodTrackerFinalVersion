@@ -1,20 +1,29 @@
 package com.example.meleagant.moodtrackerfinalversion.Controller;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import com.example.meleagant.moodtrackerfinalversion.Model.MoodData;
 import com.example.meleagant.moodtrackerfinalversion.R;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements GestureDetector.OnGestureListener {
 
     private RelativeLayout mColor;
     private ImageView mSmiley;
     public static final int BUNDLE_REQUEST_CODE = 77;
+    private GestureDetectorCompat mGesture;
+    private int smiley[] = {R.drawable.smiley_sad, R.drawable.smiley_disappointed, R.drawable.smiley_normal, R.drawable.smiley_happy, R.drawable.smiley_super_happy};
+    //copyright free music
+    private int sound[] = {R.raw.sad, R.raw.disapointed, R.raw.normal, R.raw.happy, R.raw.super_happy};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +33,14 @@ public class MainActivity extends AppCompatActivity {
         mColor = findViewById(R.id.activity_main_layout);
         mSmiley = findViewById(R.id.activity_main_smiley_img);
 
+        //get context by calling Singleton
+        try {
+            MoodData.getInstance(getApplicationContext());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        this.gestureDetector();
         this.historyBtn();
         this.commentBtn();
 
@@ -59,6 +76,79 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    //Configuration: Gesture Detector
+    //How to detect swipe movement
+    @SuppressLint("ClickableViewAccessibility")
+    private void gestureDetector() {
+        mGesture = new GestureDetectorCompat(this, this);
+        mColor.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                mGesture.onTouchEvent(event);
+                return true;
+            }
+        });
+    }
+
+
+    @Override
+    public boolean onDown(MotionEvent e) {
+        return false;
+    }
+
+    @Override
+    public void onShowPress(MotionEvent e) {
+
+    }
+
+    @Override
+    public boolean onSingleTapUp(MotionEvent e) {
+        return false;
+    }
+
+    @Override
+    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+        return false;
+    }
+
+    @Override
+    public void onLongPress(MotionEvent e) {
+
+    }
+
+    //How to make vertical swipe only
+    @Override
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+        //Vertical axe
+        float Y = Math.abs(e1.getY() - e2.getY());
+        //Horizontal axe
+        float X = Math.abs(e1.getX() - e2.getX());
+        //Initialisation vertical scroll
+        if (Y > X) {
+            if (e1.getY() - e2.getY() < 0) {
+                this.previousMood();
+            }
+            else {
+                this.nextMood();
+            }
+        }
+        return false;
+
+    }
+
+
+    // If swipe up to down (configuration)
+    // Change Background, change Smiley, play Sound
+    public void nextMood() {
+
+    }
+
+    // If swipe down to up (configuration)
+    // Change Background, change Smiley, play Sound
+    public void previousMood() {
+
+    }
+
 
     @Override
     protected void onResume() {
@@ -80,4 +170,5 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
 
     }
+
 }
