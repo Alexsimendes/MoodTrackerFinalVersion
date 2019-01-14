@@ -40,7 +40,6 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         mColor = findViewById(R.id.activity_main_layout);
         mSmiley = findViewById(R.id.activity_main_smiley_img);
 
@@ -55,10 +54,12 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         //Start is in "playMusic"
         mMediaPlayer = new MediaPlayer();
 
+        //Launch methods
+        this.moodDisplay();
         this.setImagesAndBackground();
         this.gestureDetector();
-        this.historyBtn();
         this.commentBtn();
+        this.historyBtn();
 
     }
 
@@ -68,6 +69,15 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
             int color[] = MoodData.color;
             mColor.setBackgroundResource(color[mCurrentMood]);
             mSmiley.setImageResource(smiley[mCurrentMood]);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    //Load last mood when activity start (or default mood if not used this day)
+    public void moodDisplay() {
+        try {
+            mCurrentMood = MoodData.getInstance(this.getApplicationContext()).getCurrentMood().getMood();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -166,12 +176,40 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
     // If swipe up to down (configuration)
     // Change Background, change Smiley, play Sound
     public void nextMood() {
+        if (mCurrentMood < 4) {
+            mCurrentMood++;
 
+            try {
+                int color[] = MoodData.color;
+                mColor.setBackgroundResource(color[mCurrentMood]);
+                mSmiley.setImageResource(smiley[mCurrentMood]);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            playMusic(sound[mCurrentMood]);
+            updateMood();
+
+        }
     }
 
     // If swipe down to up (configuration)
     // Change Background, change Smiley, play Sound
     public void previousMood() {
+        if (mCurrentMood > 0) {
+            mCurrentMood--;
+
+            try {
+                int color[] = MoodData.color;
+                mColor.setBackgroundResource(color[mCurrentMood]);
+                mSmiley.setImageResource(smiley[mCurrentMood]);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            playMusic(sound[mCurrentMood]);
+            updateMood();
+        }
 
     }
 
@@ -191,6 +229,23 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         }
 
         mMediaPlayer.start();
+    }
+
+    //Update mood in singleton, and save it
+    public void updateMood() {
+        //Set mood
+        try {
+            MoodData.getInstance().setCurrentMood(mDate, mCurrentMood, mComment);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        //Save in Shared Preferences and Gson/Json
+        try {
+            MoodData.getInstance().saveData();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
