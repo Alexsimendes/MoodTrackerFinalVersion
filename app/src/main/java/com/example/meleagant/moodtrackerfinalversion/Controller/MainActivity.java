@@ -2,6 +2,8 @@ package com.example.meleagant.moodtrackerfinalversion.Controller;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,6 +17,7 @@ import android.widget.RelativeLayout;
 import com.example.meleagant.moodtrackerfinalversion.Model.MoodData;
 import com.example.meleagant.moodtrackerfinalversion.R;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -27,6 +30,8 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
     private int mDate;
     public static final int BUNDLE_REQUEST_CODE = 77;
     private GestureDetectorCompat mGesture;
+    private MediaPlayer mMediaPlayer;
+    private static final String RESOURCE = "android.resource://com.example.meleagant.moodtracker/";
     private int smiley[] = {R.drawable.smiley_sad, R.drawable.smiley_disappointed, R.drawable.smiley_normal, R.drawable.smiley_happy, R.drawable.smiley_super_happy};
     //copyright free music
     private int sound[] = {R.raw.sad, R.raw.disapointed, R.raw.normal, R.raw.happy, R.raw.super_happy};
@@ -46,12 +51,27 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
             e.printStackTrace();
         }
 
+        //Create a new MediaPlayer
+        //Start is in "playMusic"
+        mMediaPlayer = new MediaPlayer();
+
+        this.setImagesAndBackground();
         this.gestureDetector();
         this.historyBtn();
         this.commentBtn();
 
     }
 
+    //Init background and smiley with currentmood
+    public void setImagesAndBackground() {
+        try {
+            int color[] = MoodData.color;
+            mColor.setBackgroundResource(color[mCurrentMood]);
+            mSmiley.setImageResource(smiley[mCurrentMood]);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     // Wire widget, configure: button(History)
     // How to lunch History Activity
@@ -155,6 +175,24 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
 
     }
 
+    //Configuration: Media Player
+    //Setting source for MediaPlayer without creating a new instance
+    private void playMusic(int sound) {
+
+        Uri path = Uri.parse(RESOURCE + sound);
+
+        try {
+            mMediaPlayer.reset();
+            mMediaPlayer.setDataSource(getApplicationContext(), path);
+            mMediaPlayer.prepare();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        mMediaPlayer.start();
+    }
+
 
     @Override
     protected void onResume() {
@@ -195,6 +233,9 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
     protected void onDestroy() {
         super.onDestroy();
 
+        //Stop and release MediaPlayer
+        mMediaPlayer.stop();
+        mMediaPlayer.release();
     }
 
 }
