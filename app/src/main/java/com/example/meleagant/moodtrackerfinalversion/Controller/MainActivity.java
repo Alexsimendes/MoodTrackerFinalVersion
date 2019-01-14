@@ -21,4 +21,26 @@ public class MainActivity extends AppCompatActivity {
         mSmiley = findViewById(R.id.activity_main_smiley_img);
 
     }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+    }
+
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+    }
 }
