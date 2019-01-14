@@ -119,13 +119,15 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
+
                         //Save in Shared Preferences and Gson/Json
                         try {
                             MoodData.getInstance().saveData();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        //New comment or Update, make info toast
+
+                        //Show toast
                         if (!mComment.equals("")) {
                             Toast.makeText(MainActivity.this, "Commentaire enregistré !", Toast.LENGTH_SHORT).show();
                         }
@@ -202,6 +204,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         //Horizontal axe
         float X = Math.abs(e1.getX() - e2.getX());
         //Initialisation vertical scroll
+
         if (Y > X) {
             if (e1.getY() - e2.getY() < 0) {
                 this.previousMood();
