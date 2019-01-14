@@ -1,18 +1,22 @@
 package com.example.meleagant.moodtrackerfinalversion.Controller;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.support.v4.view.GestureDetectorCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.example.meleagant.moodtrackerfinalversion.Model.MoodData;
 import com.example.meleagant.moodtrackerfinalversion.R;
@@ -22,6 +26,7 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity implements GestureDetector.OnGestureListener {
+
 
     private RelativeLayout mColor;
     private ImageView mSmiley;
@@ -36,10 +41,12 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
     //copyright free music
     private int sound[] = {R.raw.sad, R.raw.disapointed, R.raw.normal, R.raw.happy, R.raw.super_happy};
 
+    //Activity creation
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         mColor = findViewById(R.id.activity_main_layout);
         mSmiley = findViewById(R.id.activity_main_smiley_img);
 
@@ -60,7 +67,6 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         this.gestureDetector();
         this.commentBtn();
         this.historyBtn();
-
     }
 
     //Init background and smiley with currentmood
@@ -83,21 +89,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         }
     }
 
-    // Wire widget, configure: button(History)
-    // How to lunch History Activity
-    private void historyBtn() {
-        Button mHistory = findViewById(R.id.activity_main_history_btn);
-        mHistory.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent historyActivity = new Intent(MainActivity.this, HistoryActivity.class);
-                startActivityForResult(historyActivity, BUNDLE_REQUEST_CODE);
-            }
-        });
-    }
-
     // Wire widget, configure: button(comment)
-    // How to comment
     private void commentBtn() {
         Button mCommentBtn = findViewById(R.id.activity_main_comment_btn);
         mCommentBtn.setOnClickListener(new View.OnClickListener() {
@@ -107,7 +99,60 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
             }
 
             //how to save mood and comment, toast creation
-            private void userComment() {
+            private void userComment(){
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setMessage("Commentaire:");
+                final EditText editText = new EditText(MainActivity.this);
+                builder.setView(editText);
+
+                //How to save user comment
+                builder.setPositiveButton("VALIDER", new DialogInterface.OnClickListener() {
+                    @SuppressLint("CommitPrefEdits")
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mComment = editText.getText().toString();
+                        try {
+                            MoodData.getInstance().setCurrentMood(
+                                    MoodData.getInstance().getCurrentMood().getDate(),
+                                    MoodData.getInstance().getCurrentMood().getMood(),
+                                    mComment);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        //Save in Shared Preferences and Gson/Json
+                        try {
+                            MoodData.getInstance().saveData();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        //New comment or Update, make info toast
+                        if (!mComment.equals("")) {
+                            Toast.makeText(MainActivity.this, "Commentaire enregistré !", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+
+                }).setNegativeButton("ANNULER", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+
+                builder.create();
+                builder.show();
+            }
+        });
+    }
+
+    // Wire widget, configure: button(History)
+    // How to lunch History Activity
+    private void historyBtn() {
+        Button mHistory = findViewById(R.id.activity_main_history_btn);
+        mHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent historyActivity = new Intent(MainActivity.this, HistoryActivity.class);
+                startActivityForResult(historyActivity, BUNDLE_REQUEST_CODE);
             }
         });
     }
@@ -126,7 +171,6 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         });
     }
 
-
     @Override
     public boolean onDown(MotionEvent e) {
         return false;
@@ -134,7 +178,6 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
 
     @Override
     public void onShowPress(MotionEvent e) {
-
     }
 
     @Override
@@ -149,7 +192,6 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
 
     @Override
     public void onLongPress(MotionEvent e) {
-
     }
 
     //How to make vertical swipe only
@@ -169,9 +211,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
             }
         }
         return false;
-
     }
-
 
     // If swipe up to down (configuration)
     // Change Background, change Smiley, play Sound
@@ -188,8 +228,8 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
             }
 
             playMusic(sound[mCurrentMood]);
-            updateMood();
 
+            updateMood();
         }
     }
 
@@ -208,9 +248,26 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
             }
 
             playMusic(sound[mCurrentMood]);
+
             updateMood();
         }
+    }
 
+    //Update mood in singleton, and save it
+    public void updateMood() {
+        //Set mood
+        try {
+            MoodData.getInstance().setCurrentMood(mDate, mCurrentMood, mComment);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        //Save in Shared Preferences and Gson/Json
+        try {
+            MoodData.getInstance().saveData();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     //Configuration: Media Player
@@ -231,24 +288,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         mMediaPlayer.start();
     }
 
-    //Update mood in singleton, and save it
-    public void updateMood() {
-        //Set mood
-        try {
-            MoodData.getInstance().setCurrentMood(mDate, mCurrentMood, mComment);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        //Save in Shared Preferences and Gson/Json
-        try {
-            MoodData.getInstance().saveData();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
+    //Set mDate in "onResume" to prevent some errors; load data
     @Override
     protected void onResume() {
         super.onResume();
@@ -265,10 +305,10 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
-
+    //If activity stop: save data
+    @SuppressLint("CommitPrefEdits")
     @Override
     protected void onStop() {
         super.onStop();
@@ -279,11 +319,10 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
 
-
+    //When the app close: Stop and release the media player
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -292,5 +331,4 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         mMediaPlayer.stop();
         mMediaPlayer.release();
     }
-
 }
