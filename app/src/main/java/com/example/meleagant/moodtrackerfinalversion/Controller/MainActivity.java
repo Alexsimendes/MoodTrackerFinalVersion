@@ -24,8 +24,11 @@ public class MainActivity extends AppCompatActivity {
         mColor = findViewById(R.id.activity_main_layout);
         mSmiley = findViewById(R.id.activity_main_smiley_img);
 
+        this.historyBtn();
+        this.commentBtn();
+
     }
-    
+
 
     // Wire widget, configure: button(History)
     // How to lunch History Activity
@@ -40,6 +43,21 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // Wire widget, configure: button(comment)
+    // How to comment
+    private void commentBtn() {
+        Button mCommentBtn = findViewById(R.id.activity_main_comment_btn);
+        mCommentBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                userComment();
+            }
+
+            //how to save mood and comment, toast creation
+            private void userComment() {
+            }
+        });
+    }
 
 
     @Override
