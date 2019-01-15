@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
     public static final int BUNDLE_REQUEST_CODE = 77;
     private GestureDetectorCompat mGesture;
     private MediaPlayer mMediaPlayer;
-    private static final String RESOURCE = "android.resource://com.example.meleagant.moodtracker/";
+    private static final String RESOURCE = "android.resource://com.example.meleagant.moodtrackerfinalversion/";
     private int smiley[] = {R.drawable.smiley_sad, R.drawable.smiley_disappointed, R.drawable.smiley_normal, R.drawable.smiley_happy, R.drawable.smiley_super_happy};
     //copyright free music
     private int sound[] = {R.raw.sad, R.raw.disapointed, R.raw.normal, R.raw.happy, R.raw.super_happy};
@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         mColor = findViewById(R.id.activity_main_layout);
         mSmiley = findViewById(R.id.activity_main_smiley_img);
 
-        //get context by calling Singleton
+        //get context, call Singleton
         try {
             MoodData.getInstance(getApplicationContext());
         } catch (Exception e) {
@@ -58,7 +58,6 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         }
 
         //Create a new MediaPlayer
-        //Start is in "playMusic"
         mMediaPlayer = new MediaPlayer();
 
         //Launch methods
@@ -89,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         }
     }
 
-    // Wire widget, configure: button(comment)
+    //Configure: button(comment)
     private void commentBtn() {
         Button mCommentBtn = findViewById(R.id.activity_main_comment_btn);
         mCommentBtn.setOnClickListener(new View.OnClickListener() {
@@ -120,14 +119,14 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
                             e.printStackTrace();
                         }
 
-                        //Save in Shared Preferences and Gson/Json
+                        //Save mood, comment, date
                         try {
                             MoodData.getInstance().saveData();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
 
-                        //Show toast
+                        //Toast
                         if (!mComment.equals("")) {
                             Toast.makeText(MainActivity.this, "Commentaire enregistré !", Toast.LENGTH_SHORT).show();
                         }
@@ -146,8 +145,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         });
     }
 
-    // Wire widget, configure: button(History)
-    // How to lunch History Activity
+    //Lunch History Activity
     private void historyBtn() {
         Button mHistory = findViewById(R.id.activity_main_history_btn);
         mHistory.setOnClickListener(new View.OnClickListener() {
@@ -159,8 +157,8 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         });
     }
 
-    //Configuration: Gesture Detector
-    //How to detect swipe movement
+
+    //Detect swipe movement
     @SuppressLint("ClickableViewAccessibility")
     private void gestureDetector() {
         mGesture = new GestureDetectorCompat(this, this);
@@ -196,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
     public void onLongPress(MotionEvent e) {
     }
 
-    //How to make vertical swipe only
+    //Make vertical swipe only
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
         //Vertical axe
@@ -216,8 +214,8 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         return false;
     }
 
-    // If swipe up to down (configuration)
-    // Change Background, change Smiley, play Sound
+    // If swipe up to down
+    // Change Background, change Smiley, play Sound, update mood
     public void nextMood() {
         if (mCurrentMood < 4) {
             mCurrentMood++;
@@ -236,8 +234,8 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         }
     }
 
-    // If swipe down to up (configuration)
-    // Change Background, change Smiley, play Sound
+    // If swipe down to up
+    // Change Background, change Smiley, play Sound, update mood
     public void previousMood() {
         if (mCurrentMood > 0) {
             mCurrentMood--;
@@ -256,7 +254,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         }
     }
 
-    //Update mood in singleton, and save it
+    //Update mood in singleton and save it
     public void updateMood() {
         //Set mood
         try {
@@ -265,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
             e.printStackTrace();
         }
 
-        //Save in Shared Preferences and Gson/Json
+        //Save mood, comment, date
         try {
             MoodData.getInstance().saveData();
         } catch (Exception e) {
@@ -273,7 +271,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         }
     }
 
-    //Configuration: Media Player
+    //Media Player Config
     //Setting source for MediaPlayer without creating a new instance
     private void playMusic(int sound) {
 
@@ -296,7 +294,7 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
     protected void onResume() {
         super.onResume();
 
-        //Configure Calendar
+        //Configure Calendar, get date
         Calendar mCalendar = Calendar.getInstance(TimeZone.getDefault());
         mDate = (mCalendar.get(Calendar.YEAR)*10000)+
                 (mCalendar.get(Calendar.MONTH)*100)+
@@ -310,13 +308,12 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         }
     }
 
-    //If activity stop: save data
     @SuppressLint("CommitPrefEdits")
     @Override
     protected void onStop() {
         super.onStop();
 
-        //Save in Shared Preferences and Gson/Json
+        //Save mood, comment, date
         try {
             MoodData.getInstance().saveData();
         } catch (Exception e) {
@@ -324,8 +321,6 @@ public class MainActivity extends AppCompatActivity implements GestureDetector.O
         }
     }
 
-
-    //When the app close: Stop and release the media player
     @Override
     protected void onDestroy() {
         super.onDestroy();

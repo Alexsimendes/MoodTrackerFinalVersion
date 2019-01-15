@@ -61,6 +61,7 @@ public class HistoryActivity extends AppCompatActivity {
             try {
                 MoodList mMood = MoodData.getInstance().getMoodByIndex(7-i);
                 layoutDisplay(mRelativeLayoutDaysAgo[i], mMood.getMood());
+
                 //Config imageview visibility
                 String mComment = mMood.getComment();
                 if (mComment.equals("")){
@@ -82,7 +83,8 @@ public class HistoryActivity extends AppCompatActivity {
     private void layoutDisplay(RelativeLayout relativeLayout, int mCurrentMood) {
         ViewGroup.LayoutParams params = relativeLayout.getLayoutParams();
         int mWidthScreen = widthPhone();
-        //Configure Relative Layouts width and color by mood
+
+        //Configure Relative Layout width and color by mood
         try {
             int color[] = MoodData.color;
             params.width =  (mCurrentMood+1)*mWidthScreen/5;
@@ -96,6 +98,7 @@ public class HistoryActivity extends AppCompatActivity {
     private final View.OnClickListener onClickLayout = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+
             //Configure Toast, when you click on ImageView
             try {
                 //XML Tags are use to connect comments/imageviews with the rigth Relative Layouts
