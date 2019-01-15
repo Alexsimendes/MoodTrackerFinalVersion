@@ -70,12 +70,14 @@ public class MoodData {
         if (json == null){
             moodMap = new LinkedHashMap<>();
         }
+
         else {
             Type mapType = new TypeToken<LinkedHashMap<Integer, MoodList>>() {}.getType();
             moodMap = gson.fromJson(json, mapType);
             getCurrentMood();
         }
 
+        //Only save the last 8 days
         for (int day = 0; day < 8; day++){
             int key = currentDate(-day);
             if (!moodMap.containsKey(key)){
@@ -92,7 +94,7 @@ public class MoodData {
         return  currentDate(0);
     }
 
-    //Get a calendar
+    //Get date, and calendar for history
     private int currentDate(int days) {
         Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
         calendar.add(Calendar.DATE, days);
@@ -128,7 +130,7 @@ public class MoodData {
         return getMood(mDate);
     }
 
-    //How to set mood
+    //How to set mood, and update moodMap
     public void setCurrentMood(int mDate, int mCurrentMood, String mComment){
 
         currentDate();
