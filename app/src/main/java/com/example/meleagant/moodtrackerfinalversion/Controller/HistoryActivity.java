@@ -61,11 +61,10 @@ public class HistoryActivity extends AppCompatActivity {
             try {
                 MoodList mMood = MoodData.getInstance().getMoodByIndex(7-i);
                 layoutDisplay(mRelativeLayoutDaysAgo[i], mMood.getMood());
-
                 //Config imageview visibility
                 String mComment = mMood.getComment();
-                if (mComment.equals("")){
-                    mImageViewDaysAgo[i].setVisibility(View.GONE); }
+                if (!mComment.equals("")){
+                    mImageViewDaysAgo[i].setVisibility(View.VISIBLE); }
             } catch (Exception e) {
                 e.printStackTrace();
             }
